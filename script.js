@@ -10,20 +10,25 @@ tg.ready();
 
 // Start camera
 async function initCamera() {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-            video: {
-                facingMode: 'user',
-                width: { ideal: 1280 },
-                height: { ideal: 1280 }
-            },
-            audio: false
-        });
-        video.srcObject = stream;
-    } catch (err) {
-        console.error("Camera error:", err);
-        alert("Kameraga ruxsat berilmadi yoki u ishlamayapti.");
+    const constraints = [
+        { video: { facingMode: 'user' }, audio: false },
+        { video: true, audio: false }
+    ];
+
+    for (const constraint of constraints) {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia(constraint);
+            video.srcObject = stream;
+            video.onloadedmetadata = () => {
+                video.play();
+            };
+            return;
+        } catch (err) {
+            console.error("Constraint failed:", constraint, err);
+        }
     }
+
+    alert("Kameraga ruxsat berilmadi yoki u ishlamayapti. Iltimos, brauzer sozlamalarini tekshiring.");
 }
 
 initCamera();
